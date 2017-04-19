@@ -3,6 +3,7 @@ import videojs from 'video.js';
 import window from 'global/window';
 
 const defaults = {
+  id: '',
   align: 'top-left',
   class: '',
   content: 'This overlay will show up while the video is playing',
@@ -95,9 +96,18 @@ class Overlay extends Component {
   createEl() {
     let options = this.options_;
     let content = options.content;
+    
+    var groups = $('.vjs-overlays').length > 0 ? $('.vjs-overlays')[0] : undefined;
+    if(!groups) {
+      groups = dom.createEl('div', {
+        className: 'vjs-overlays'
+      })
+    }
 
     let background = options.showBackground ? 'vjs-overlay-background' : 'vjs-overlay-no-background';
+    
     let el = dom.createEl('div', {
+      id: options.id,
       className: `
         vjs-overlay
         vjs-overlay-${options.align}
@@ -115,7 +125,9 @@ class Overlay extends Component {
       dom.appendContent(el, content);
     }
 
-    return el;
+    groups.appendChild(el);
+
+    return groups;
   }
 
   /**
@@ -145,7 +157,10 @@ class Overlay extends Component {
    * @return {Overlay}
    */
   hide() {
-    super.hide();
+    // super.hide();
+    var childOverlay = $('.vjs-overlays #' + this.options_.id);
+    
+    $(childOverlay).addClass('vjs-hidden');
 
     this.debug('hidden');
     this.debug(`bound \`startListener_\` to "${this.startEvent_}"`);
@@ -182,7 +197,11 @@ class Overlay extends Component {
    * @return {Overlay}
    */
   show() {
-    super.show();
+    // super.show();
+    var childOverlay = $('.vjs-overlays #' + this.options_.id);
+    
+    $(childOverlay).removeClass('vjs-hidden');
+
     this.off(this.player(), this.startEvent_, this.startListener_);
     this.debug('shown');
     this.debug(`unbound \`startListener_\` from "${this.startEvent_}"`);
