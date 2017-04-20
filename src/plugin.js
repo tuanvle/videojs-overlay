@@ -13,7 +13,8 @@ const defaults = {
   overlays: [{
     start: 'playing',
     end: 'paused'
-  }]
+  }],
+  onClick: function(){}
 };
 
 const Component = videojs.getComponent('Component');
@@ -114,7 +115,7 @@ class Overlay extends Component {
         ${options.class}
         ${background}
         vjs-hidden
-      `
+      `,
     });
 
     if (typeof content === 'string') {
@@ -124,6 +125,18 @@ class Overlay extends Component {
     } else {
       dom.appendContent(el, content);
     }
+
+    var self = this;
+    $(el).on('click tap', function(e){
+
+      if(self.options_.onClick) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        e.stopPropagation();
+
+        self.options_.onClick(self.options_.id);
+      }
+    });
 
     groups.appendChild(el);
 
